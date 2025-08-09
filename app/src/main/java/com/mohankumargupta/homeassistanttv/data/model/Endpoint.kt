@@ -1,6 +1,6 @@
 package com.mohankumargupta.homeassistanttv.data.model
 
-data class HAInstance(
+data class Endpoint(
     val ip: String,
-    val port: Int,
+    val port: String,
 )
