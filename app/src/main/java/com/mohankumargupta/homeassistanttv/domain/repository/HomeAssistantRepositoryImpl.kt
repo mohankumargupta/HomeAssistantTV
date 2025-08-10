@@ -4,8 +4,9 @@ import com.mohankumargupta.homeassistanttv.data.repository.MDNSRepository
 import com.mohankumargupta.homeassistanttv.domain.model.HomeAssistant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class HomeAssistantRepositoryImpl(
+class HomeAssistantRepositoryImpl @Inject constructor(
     private val mdnsRepository: MDNSRepository
 ) : HomeAssistantRepository {
     val service = "_home-assistant._tcp."

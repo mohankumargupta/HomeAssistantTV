@@ -10,7 +10,9 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Surface
 import com.mohankumargupta.homeassistanttv.navigation.AppNavigation
 import com.mohankumargupta.homeassistanttv.presentation.theme.HomeAssistantTVTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalTvMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {

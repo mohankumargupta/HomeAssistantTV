@@ -4,13 +4,15 @@ import android.content.Context
 import com.mohankumargupta.homeassistanttv.data.model.Endpoint
 import com.mohankumargupta.homeassistanttv.data.remote.DiscoveryEvent
 import com.mohankumargupta.homeassistanttv.data.remote.MDNSDataSource
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MDNSRepositoryImpl(
-    private val context: Context,
+class MDNSRepositoryImpl @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val mdnsDataSource: MDNSDataSource
 ): MDNSRepository  {
     override fun discoverEndpoints(service: String): Flow<List<Endpoint>> = channelFlow {

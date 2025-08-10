@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import java.net.InetAddress
+import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -38,7 +39,7 @@ sealed class DiscoveryEvent {
     data class Removed(val service: DiscoveredService) : DiscoveryEvent()
 }
 
-class MDNSDataSourceImpl() : MDNSDataSource {
+class MDNSDataSourceImpl @Inject constructor() : MDNSDataSource {
     override fun discoverServices(context: Context, service: String): Flow<DiscoveryEvent> =
         callbackFlow {
             val nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
