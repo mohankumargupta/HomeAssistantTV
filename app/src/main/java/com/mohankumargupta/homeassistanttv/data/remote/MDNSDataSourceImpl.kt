@@ -30,21 +30,11 @@ data class DiscoveredService(
     val addresses: List<String>
 )
 
-/**
- * Defines the events emitted during service discovery.
- */
 sealed class DiscoveryEvent {
     data class Discovered(
         val service: DiscoveredService,
-        /**
-         * A suspend function to resolve the full details of this service.
-         * Returns the resolved service, or null if resolution fails or times out.
-         *
-         * Calls to `onResolve` are non-blocking and are safely queued for processing.
-         */
         val onResolve: suspend () -> DiscoveredService?
     ) : DiscoveryEvent()
-
     data class Removed(val service: DiscoveredService) : DiscoveryEvent()
 }
 
@@ -54,15 +44,11 @@ class MDNSDataSourceImpl() : MDNSDataSource {
             val nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
             val resolveChannel = Channel<ResolutionRequest>(Channel.BUFFERED)
 
-            // Launch a single, long-running consumer coroutine to process the resolution queue.
-            // This coroutine will be automatically cancelled when the flow is closed.
             val resolutionJob = launch(Dispatchers.IO) {
                 for (request in resolveChannel) {
                     val (serviceInfo, deferred) = request
                     try {
-                        // Process one resolution request at a time.
                         val result = withTimeoutOrNull(RESOLVE_TIMEOUT_MS) {
-                            //with context dispatchers.main
                             resolveServiceInternal(nsdManager, serviceInfo)
                         }
                         deferred.complete(result)
@@ -73,9 +59,8 @@ class MDNSDataSourceImpl() : MDNSDataSource {
             }
 
             val listener = object : NsdManager.DiscoveryListener {
-                override fun onDiscoveryStarted(serviceType: String) { /* No-op */ }
-                override fun onDiscoveryStopped(serviceType: String) { /* No-op */ }
-
+                override fun onDiscoveryStarted(serviceType: String) {  }
+                override fun onDiscoveryStopped(serviceType: String) {  }
                 override fun onServiceFound(serviceInfo: NsdServiceInfo) {
                     trySend(
                         DiscoveryEvent.Discovered(
@@ -83,8 +68,8 @@ class MDNSDataSourceImpl() : MDNSDataSource {
                             onResolve = {
                                 val deferred = CompletableDeferred<DiscoveredService?>()
                                 val request = ResolutionRequest(serviceInfo, deferred)
-                                resolveChannel.send(request) // Send request to the queue
-                                deferred.await() // Wait for the consumer to process it
+                                resolveChannel.send(request)
+                                deferred.await()
                             }
                         )
                     )
@@ -109,32 +94,21 @@ class MDNSDataSourceImpl() : MDNSDataSource {
             }
 
             awaitClose {
-                // Cleanup sequence is important
                 try {
                     nsdManager.stopServiceDiscovery(listener)
-                } catch (e: Exception) { /* Swallow */ }
+                } catch (e: Exception) {  }
 
-                // Close the channel. This will terminate the for-loop in the consumer coroutine.
                 resolveChannel.close()
                 // Wait for the consumer to finish its final task, if any.
                 //resolutionJob.join()
             }
-
         }
 
-
-    /**
-     * A private data class to bundle a resolution request with a way to return its result.
-     */
     private data class ResolutionRequest(
         val serviceInfo: NsdServiceInfo,
         val resultDeferred: CompletableDeferred<DiscoveredService?>
     )
 
-
-    /**
-     * The core suspendable coroutine for resolving a service.
-     */
     private suspend fun resolveServiceInternal(
         nsdManager: NsdManager,
         serviceInfo: NsdServiceInfo
@@ -152,9 +126,6 @@ class MDNSDataSourceImpl() : MDNSDataSource {
         nsdManager.resolveService(serviceInfo, listener)
     }
 
-    /**
-     * Converts an Android-specific [NsdServiceInfo] to a common [DiscoveredService].
-     */
     internal fun NsdServiceInfo.toCommon(): DiscoveredService {
         val hostAddresses: List<InetAddress> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             this.hostAddresses
