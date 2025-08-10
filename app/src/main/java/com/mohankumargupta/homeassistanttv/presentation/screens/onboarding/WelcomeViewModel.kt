@@ -9,5 +9,8 @@ import javax.inject.Inject
 class WelcomeViewModel @Inject constructor(
     private val homeAssistantRepository: HomeAssistantRepository
 ) : ViewModel() {
+    fun discoverHomeAssistants() {
+
+    }
 
 }

@@ -28,6 +28,14 @@ fun WelcomeScreen(
     viewModel: WelcomeViewModel = hiltViewModel(),
     onNextScreen: () -> Unit = {}
 ) {
+  Welcome(modifier, onClick = {
+      viewModel.discoverHomeAssistants()
+      onNextScreen()
+  })
+}
+
+@Composable
+fun Welcome(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -53,7 +61,7 @@ fun WelcomeScreen(
             ) {
                 Text("Welcome to Home Assistant TV", style = MaterialTheme.typography.displayLarge)
                 Button(
-                    onClick = onNextScreen,
+                    onClick = onClick,
                     modifier = modifier.focusRequester(focusRequester)
                 ) {
                     Text("Get Started")
@@ -69,7 +77,7 @@ fun WelcomeScreen(
 fun WelcomePreview() {
     HomeAssistantTVTheme(isInDarkTheme = true) {
         Surface {
-            WelcomeScreen()
+            Welcome()
         }
     }
 }
