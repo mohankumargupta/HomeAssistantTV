@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -130,7 +130,7 @@ fun HomeAssistantListItem(
         onClick = onClick,
         leadingContent = {
             Icon(
-                imageVector = Icons.Default.Phone,
+                imageVector = Icons.Default.Home,
                 contentDescription = null,
                 modifier = Modifier.padding(end = 16.dp)
             )
@@ -138,8 +138,8 @@ fun HomeAssistantListItem(
         headlineContent = { Text(text = homeAssistant.ip) },
         supportingContent = {
             Text(
-                text = "Port: ${homeAssistant.port}",
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                text = "Port: ${homeAssistant.port}", style = MaterialTheme.typography.bodyLarge
+                //color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
     )

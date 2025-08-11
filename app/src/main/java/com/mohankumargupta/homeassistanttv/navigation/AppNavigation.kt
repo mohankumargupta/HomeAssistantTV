@@ -26,7 +26,7 @@ fun AppNavigation() {
         entryProvider = entryProvider {
             entry<AppNavKey.Welcome> {
                 WelcomeScreen(onNextScreen = {
-                  backStack.add(AppNavKey.Home)
+                  backStack.add(AppNavKey.HomeAssistantSearch)
                 })
             }
 
