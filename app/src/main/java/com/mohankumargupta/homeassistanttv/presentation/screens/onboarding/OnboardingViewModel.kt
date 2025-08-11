@@ -1,7 +1,11 @@
 package com.mohankumargupta.homeassistanttv.presentation.screens.onboarding
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mohankumargupta.homeassistanttv.domain.model.HomeAssistant
 import com.mohankumargupta.homeassistanttv.domain.usecase.HomeAssistantUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -10,11 +14,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
-    private val homeAssistantUseCase: HomeAssistantUseCase
+    homeAssistantUseCase: HomeAssistantUseCase
 ) : ViewModel() {
     val homeAssistants = homeAssistantUseCase().stateIn(
         viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList(),
     )
+
+    var selectedHomeAssistant: HomeAssistant? by mutableStateOf(null)
+        private set
+
+    fun onClickHomeAssistant(homeAssistant: HomeAssistant) {
+        selectedHomeAssistant = homeAssistant
+    }
+
+    fun onClickConnecting() {
+
+    }
 }

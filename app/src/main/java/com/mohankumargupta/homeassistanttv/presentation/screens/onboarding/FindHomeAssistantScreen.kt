@@ -37,10 +37,13 @@ import com.mohankumargupta.homeassistanttv.presentation.theme.HomeAssistantTVThe
 fun FindHomeAssistantScreen(
     modifier: Modifier = Modifier,
     viewModel: OnboardingViewModel = hiltViewModel(),
-    nextScreen: (HomeAssistant) -> Unit = {},
+    onNextScreen: () -> Unit = {},
 ) {
     val assistants by viewModel.homeAssistants.collectAsStateWithLifecycle()
-    FindHomeAssistants(modifier, assistants, nextScreen)
+    FindHomeAssistants(modifier, assistants ) { homeAssistant ->
+        viewModel.onClickHomeAssistant(homeAssistant)
+        onNextScreen()
+    }
 
 }
 
@@ -48,7 +51,7 @@ fun FindHomeAssistantScreen(
 fun FindHomeAssistants(
     modifier: Modifier = Modifier,
     assistants: List<HomeAssistant>,
-    nextScreen: (HomeAssistant) -> Unit
+    onClick: (HomeAssistant) -> Unit
 ) {
     Box(
         modifier = modifier
@@ -78,7 +81,7 @@ fun FindHomeAssistants(
                 // Once instances are found, display them in a TV-optimized list
                 HomeAssistantList(
                     assistants = assistants,
-                    onInstanceClicked = nextScreen
+                    onClick = onClick
                 )
             }
         }
@@ -88,7 +91,7 @@ fun FindHomeAssistants(
 @Composable
 fun HomeAssistantList(
     assistants: List<HomeAssistant>,
-    onInstanceClicked: (HomeAssistant) -> Unit,
+    onClick: (HomeAssistant) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -103,7 +106,7 @@ fun HomeAssistantList(
         items(assistants) { ha ->
             HomeAssistantListItem(
                 homeAssistant = ha,
-                onClick = { onInstanceClicked(ha) }
+                onClick = { onClick(ha) }
             )
         }
     }
@@ -170,7 +173,7 @@ fun WelcomeScreenFoundPreview() {
         Surface {
             // We can't inject a ViewModel in a preview, so we'll preview the sub-composable
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                HomeAssistantList(assistants = sampleData, onInstanceClicked = {})
+                HomeAssistantList(assistants = sampleData, onClick = {})
             }
         }
     }

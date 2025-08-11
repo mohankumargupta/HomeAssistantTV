@@ -10,5 +10,7 @@ sealed interface AppNavKey: NavKey {
     @Serializable
     object HomeAssistantSearch: AppNavKey
     @Serializable
+    object ConnectionInstruction: AppNavKey
+    @Serializable
     object Home: AppNavKey
 }
