@@ -15,7 +15,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.tooling.preview.Devices.TV_720p
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
@@ -25,17 +24,8 @@ import com.mohankumargupta.homeassistanttv.presentation.theme.HomeAssistantTVThe
 @Composable
 fun WelcomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: WelcomeViewModel = hiltViewModel(),
     onNextScreen: () -> Unit = {}
 ) {
-  Welcome(modifier, onClick = {
-      viewModel.discoverHomeAssistants()
-      onNextScreen()
-  })
-}
-
-@Composable
-fun Welcome(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -61,7 +51,7 @@ fun Welcome(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
             ) {
                 Text("Welcome to Home Assistant TV", style = MaterialTheme.typography.displayLarge)
                 Button(
-                    onClick = onClick,
+                    onClick = onNextScreen,
                     modifier = modifier.focusRequester(focusRequester)
                 ) {
                     Text("Get Started")
@@ -77,7 +67,7 @@ fun Welcome(modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
 fun WelcomePreview() {
     HomeAssistantTVTheme(isInDarkTheme = true) {
         Surface {
-            Welcome()
+            WelcomeScreen()
         }
     }
 }

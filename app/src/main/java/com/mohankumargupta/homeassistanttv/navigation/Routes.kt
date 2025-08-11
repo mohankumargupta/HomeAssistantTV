@@ -8,5 +8,7 @@ sealed interface AppNavKey: NavKey {
     @Serializable
     object Welcome: AppNavKey
     @Serializable
+    object HomeAssistantSearch: AppNavKey
+    @Serializable
     object Home: AppNavKey
 }
