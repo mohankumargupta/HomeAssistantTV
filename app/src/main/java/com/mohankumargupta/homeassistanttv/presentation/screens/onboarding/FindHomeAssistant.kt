@@ -34,15 +34,26 @@ import com.mohankumargupta.homeassistanttv.domain.model.HomeAssistant
 import com.mohankumargupta.homeassistanttv.presentation.theme.HomeAssistantTVTheme
 
 @Composable
-fun FindHomeAssistant(
+fun FindHomeAssistantScreen(
     modifier: Modifier = Modifier,
     viewModel: OnboardingViewModel = hiltViewModel(),
-    nextScreen: (HomeAssistant) -> Unit,
+    nextScreen: (HomeAssistant) -> Unit = {},
 ) {
     val assistants by viewModel.homeAssistants.collectAsStateWithLifecycle()
+    FindHomeAssistants(modifier, assistants, nextScreen)
 
+}
+
+@Composable
+fun FindHomeAssistants(
+    modifier: Modifier = Modifier,
+    assistants: List<HomeAssistant>,
+    nextScreen: (HomeAssistant) -> Unit
+) {
     Box(
-        modifier = modifier.fillMaxSize().padding(horizontal = 58.dp, vertical = 36.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 58.dp, vertical = 36.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -141,7 +152,9 @@ fun HomeAssistantListItem(
 fun WelcomeScreenSearchingPreview() {
     HomeAssistantTVTheme(isInDarkTheme = true) {
         Surface {
-            WelcomeScreen()
+            FindHomeAssistants(assistants = emptyList()) {
+
+            }
         }
     }
 }

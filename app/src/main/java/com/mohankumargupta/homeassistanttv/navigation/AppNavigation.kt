@@ -9,7 +9,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
-import com.mohankumargupta.homeassistanttv.presentation.screens.onboarding.FindHomeAssistant
+import com.mohankumargupta.homeassistanttv.presentation.screens.onboarding.FindHomeAssistantScreen
 import com.mohankumargupta.homeassistanttv.presentation.screens.onboarding.WelcomeScreen
 
 @Composable
@@ -31,7 +31,7 @@ fun AppNavigation() {
             }
 
             entry<AppNavKey.HomeAssistantSearch> {
-                FindHomeAssistant()
+                FindHomeAssistantScreen()
             }
 
             entry<AppNavKey.Home> {
