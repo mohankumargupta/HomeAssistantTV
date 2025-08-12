@@ -92,6 +92,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.datastore.preferences)
 
+    implementation(libs.retrofit.core)
+    implementation(libs.okhttp)
+    implementation(libs.retrofit.converters.scalar)
+
+
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()                  // run JUnit 5 in unit-test source-set
     }
