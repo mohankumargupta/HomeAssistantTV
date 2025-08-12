@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface HomeAssistantRepository {
     fun discoverHomeAssistants(): Flow<List<HomeAssistant>>
+    suspend fun retrieveTokenAndConnectHomeAssistant(homeAssistant: HomeAssistant)
 }
