@@ -22,7 +22,7 @@ fun AppNavigation() {
         entryDecorators = listOf(
             rememberSceneSetupNavEntryDecorator(),
             rememberSavedStateNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
+            //rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
             entry<AppNavKey.Welcome> {

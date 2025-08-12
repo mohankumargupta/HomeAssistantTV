@@ -26,7 +26,7 @@ fun ConnectingInstructionScreen(
 ) {
     ConnectionInstruction(modifier) {
         viewModel.onClickConnecting()
-        onNextScreen()
+        //onNextScreen()
     }
 }
 
