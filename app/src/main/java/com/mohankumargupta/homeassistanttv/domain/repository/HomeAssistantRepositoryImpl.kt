@@ -37,3 +37,73 @@ class HomeAssistantRepositoryImpl @Inject constructor(
 private fun HomeAssistant.toEndpoint(): Endpoint {
     return Endpoint(ip = ip, port = port)
 }
+
+
+/*
+override fun retrieveTokenAndConnectHomeAssistant(homeAssistant: HomeAssistant): Flow<ConnectionState> = channelFlow {
+        trySend(ConnectionState.Connecting)
+
+        // 1) Get the access token (you already have this via Node-RED on :1880)
+        val token = mdnsRepository
+            .getAccessToken(homeAssistant.toEndpoint())
+            .catch { e -> throw e }
+            .first()
+
+        // 2) Connect WebSocket to Home Assistant
+        val url = "ws://${homeAssistant.ip}:${homeAssistant.port}/api/websocket"
+
+        webSocketDataSource.connect(url).collect { event ->
+            when (event) {
+                is com.mohankumargupta.homeassistanttv.data.remote.WebSocketEvent.Open -> {
+                    // Connected at TCP/WebSocket level; wait for auth_required from HA
+                }
+
+                is com.mohankumargupta.homeassistanttv.data.remote.WebSocketEvent.TextMessage -> {
+                    val raw = event.text
+                    val json = runCatching { JSONObject(raw) }.getOrNull()
+                    val type = json?.optString("type", null)
+
+                    when (type) {
+                        "auth_required" -> {
+                            trySend(ConnectionState.AuthRequired)
+                            val auth = JSONObject()
+                                .put("type", "auth")
+                                .put("access_token", token)
+                            webSocketDataSource.send(auth.toString())
+                        }
+                        "auth_ok" -> {
+                            trySend(ConnectionState.Authenticated)
+                            // You can now send commands like subscribe_events, get_states, etc.
+                            // Example:
+                            // val cmd = JSONObject().put("id", 1).put("type", "get_states")
+                            // webSocketDataSource.send(cmd.toString())
+                        }
+                        "auth_invalid" -> {
+                            val msg = json?.optString("message", "Authentication failed")
+                            trySend(ConnectionState.Error(IllegalStateException(msg)))
+                            webSocketDataSource.close(4001, "auth_invalid")
+                        }
+                        else -> {
+                            // Any other HA message (events, results, etc.)
+                            trySend(ConnectionState.Message(type = type, raw = raw))
+                        }
+                    }
+                }
+
+                is com.mohankumargupta.homeassistanttv.data.remote.WebSocketEvent.Closing -> {
+                    trySend(ConnectionState.Closed(event.code, event.reason))
+                }
+
+                is com.mohankumargupta.homeassistanttv.data.remote.WebSocketEvent.Closed -> {
+                    trySend(ConnectionState.Closed(event.code, event.reason))
+                }
+
+                is com.mohankumargupta.homeassistanttv.data.remote.WebSocketEvent.Failure -> {
+                    trySend(ConnectionState.Error(event.throwable))
+                }
+            }
+        }
+    }
+}
+
+ */
