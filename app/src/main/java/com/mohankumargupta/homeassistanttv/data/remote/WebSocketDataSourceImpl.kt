@@ -22,24 +22,24 @@ class HomeAssistantWebSocketDataSourceImpl @Inject constructor(
         val request = requestBuilder.build()
 
         val listener = object : WebSocketListener() {
-            override fun onOpen(ws: WebSocket, response: Response) {
-                webSocket = ws
+            override fun onOpen(webSocket: WebSocket, response: Response) {
+                this@HomeAssistantWebSocketDataSourceImpl.webSocket = webSocket
                 trySend(WebSocketEvent.Open(response))
             }
 
-            override fun onMessage(ws: WebSocket, text: String) {
+            override fun onMessage(webSocket: WebSocket, text: String) {
                 trySend(WebSocketEvent.TextMessage(text))
             }
 
-            override fun onClosing(ws: WebSocket, code: Int, reason: String) {
+            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                 trySend(WebSocketEvent.Closing(code, reason))
             }
 
-            override fun onClosed(ws: WebSocket, code: Int, reason: String) {
+            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                 trySend(WebSocketEvent.Closed(code, reason))
             }
 
-            override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 trySend(WebSocketEvent.Failure(t))
                 close(t)
             }
