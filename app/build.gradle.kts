@@ -96,6 +96,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.retrofit.converters.scalar)
 
+    implementation(libs.kotlin.serialization.json)
+
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()                  // run JUnit 5 in unit-test source-set
