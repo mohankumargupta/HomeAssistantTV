@@ -1,7 +1,9 @@
 package com.mohankumargupta.homeassistanttv.di
 
+import com.mohankumargupta.homeassistanttv.data.remote.HomeAssistantWebSocketDataSourceImpl
 import com.mohankumargupta.homeassistanttv.data.remote.MDNSDataSource
 import com.mohankumargupta.homeassistanttv.data.remote.MDNSDataSourceImpl
+import com.mohankumargupta.homeassistanttv.data.remote.WebSocketDataSource
 import com.mohankumargupta.homeassistanttv.data.repository.MDNSRepository
 import com.mohankumargupta.homeassistanttv.data.repository.MDNSRepositoryImpl
 import com.mohankumargupta.homeassistanttv.domain.repository.HomeAssistantRepository
@@ -35,6 +37,12 @@ abstract class AppModule {
     abstract fun bindMDNSDataSource(
         impl: MDNSDataSourceImpl
     ): MDNSDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindWebSocketDataSource(
+        impl: HomeAssistantWebSocketDataSourceImpl
+    ): WebSocketDataSource
 
     companion object {
         @Provides
