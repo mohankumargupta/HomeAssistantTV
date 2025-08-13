@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,9 +15,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.mohankumargupta.homeassistanttv.domain.model.WebSocketConnectionState
 
 @Composable
 fun ConnectingInstructionScreen(
@@ -24,10 +27,31 @@ fun ConnectingInstructionScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
     onNextScreen: () -> Unit = {},
 ) {
+    val connectionState by viewModel.connectionState.collectAsStateWithLifecycle(initialValue = null)
+
+    when (connectionState) {
+        WebSocketConnectionState.Authenticated -> {
+            Connected { onNextScreen() }
+        }
+        is WebSocketConnectionState.Closed -> {}
+        is WebSocketConnectionState.Error -> {}
+        else -> {
+            ConnectionInstruction(modifier) {
+                viewModel.onClickConnecting()
+            }
+        }
+    }
+
+
     ConnectionInstruction(modifier) {
         viewModel.onClickConnecting()
-        //onNextScreen()
+
     }
+}
+
+@Composable
+fun Connected(modifier: Modifier = Modifier, onSelected: () -> Unit = {}) {
+    Text("Connected")
 }
 
 @Composable

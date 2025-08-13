@@ -1,6 +1,7 @@
 package com.mohankumargupta.homeassistanttv.domain.repository
 
 import com.mohankumargupta.homeassistanttv.domain.model.HomeAssistant
+import com.mohankumargupta.homeassistanttv.domain.model.WebSocketConnectionState
 import kotlinx.coroutines.flow.Flow
 
 interface HomeAssistantRepository {

@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.encodeToString
 import javax.inject.Inject
 
 class HomeAssistantRepositoryImpl @Inject constructor(
