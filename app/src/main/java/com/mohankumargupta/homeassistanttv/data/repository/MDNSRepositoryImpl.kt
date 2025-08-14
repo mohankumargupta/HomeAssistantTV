@@ -1,7 +1,9 @@
 package com.mohankumargupta.homeassistanttv.data.repository
 
 import android.content.Context
+import com.mohankumargupta.homeassistanttv.data.local.PreferencesDataStore
 import com.mohankumargupta.homeassistanttv.data.model.Endpoint
+import com.mohankumargupta.homeassistanttv.data.model.UserPreferences
 import com.mohankumargupta.homeassistanttv.data.remote.DiscoveryEvent
 import com.mohankumargupta.homeassistanttv.data.remote.HTTPDataSource
 import com.mohankumargupta.homeassistanttv.data.remote.MDNSDataSource
@@ -19,7 +21,8 @@ import javax.inject.Inject
 class MDNSRepositoryImpl @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val mdnsDataSource: MDNSDataSource,
-    private val okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient,
+    private val preferencesDataSource: PreferencesDataStore
 ) : MDNSRepository {
     override fun discoverEndpoints(service: String): Flow<List<Endpoint>> = channelFlow {
         val nameToKey = mutableMapOf<String, String>()
@@ -77,6 +80,12 @@ class MDNSRepositoryImpl @Inject constructor(
             val api = retrofit.create(HTTPDataSource::class.java)
             emit(api.getAccessToken())
         }
+
+    override fun getUserPreferences(): Flow<UserPreferences> = preferencesDataSource.getPreferences()
+
+    override suspend fun saveUserPreferences(userPreferences: UserPreferences) {
+        preferencesDataSource.savePreferences(userPreferences)
+    }
 
     private fun String.isIpv4(): Boolean = !contains(':')
 }
