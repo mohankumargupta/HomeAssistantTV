@@ -9,6 +9,7 @@ import com.mohankumargupta.homeassistanttv.domain.model.HomeAssistant
 import com.mohankumargupta.homeassistanttv.domain.model.WebSocketConnectionState
 import com.mohankumargupta.homeassistanttv.domain.usecase.ConnectHomeAssistanceUseCase
 import com.mohankumargupta.homeassistanttv.domain.usecase.HomeAssistantUseCase
+import com.mohankumargupta.homeassistanttv.domain.usecase.ListAreasUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     homeAssistantUseCase: HomeAssistantUseCase,
-    private val connectHomeAssistantUseCase: ConnectHomeAssistanceUseCase
+    private val connectHomeAssistantUseCase: ConnectHomeAssistanceUseCase,
+    private val listAreasUseCase: ListAreasUseCase
 ) : ViewModel() {
 
     private val _connectionState = MutableStateFlow<WebSocketConnectionState?>(null)
@@ -35,6 +37,8 @@ class OnboardingViewModel @Inject constructor(
     var selectedHomeAssistant: HomeAssistant? by mutableStateOf(null)
         private set
 
+
+
     fun onClickHomeAssistant(homeAssistant: HomeAssistant) {
         selectedHomeAssistant = homeAssistant
     }
@@ -44,9 +48,12 @@ class OnboardingViewModel @Inject constructor(
             selectedHomeAssistant?.let { homeAssistant ->
                 connectHomeAssistantUseCase(homeAssistant).collect { connectionState ->
                     _connectionState.value = connectionState
+                    listAreasUseCase()
                 }
             }
         }
 
     }
+
+
 }

@@ -7,6 +7,7 @@ import com.mohankumargupta.homeassistanttv.data.model.AuthRequired
 import com.mohankumargupta.homeassistanttv.data.model.Endpoint
 import com.mohankumargupta.homeassistanttv.data.model.HAIncoming
 import com.mohankumargupta.homeassistanttv.data.model.HAOutgoing
+import com.mohankumargupta.homeassistanttv.data.model.ListAreas
 import com.mohankumargupta.homeassistanttv.data.model.haJson
 import com.mohankumargupta.homeassistanttv.data.remote.WebSocketDataSource
 import com.mohankumargupta.homeassistanttv.data.remote.WebSocketEvent
@@ -18,12 +19,15 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 class HomeAssistantRepositoryImpl @Inject constructor(
     private val mdnsRepository: MDNSRepository,
     private val webSocketDataSource: WebSocketDataSource
 ) : HomeAssistantRepository {
+
+    private val messageId = AtomicInteger(1)
     private val service = "_home-assistant._tcp."
     override fun discoverHomeAssistants(): Flow<List<HomeAssistant>> =
         mdnsRepository.discoverEndpoints(service).map { endpoints ->
@@ -93,6 +97,12 @@ class HomeAssistantRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override fun getAreas() {
+        val message = ListAreas(messageId.getAndIncrement())
+        val messageJson = haJson.encodeToString(HAOutgoing.serializer(), message)
+        webSocketDataSource.send(messageJson)
+    }
 }
 
 private fun HomeAssistant.toEndpoint(): Endpoint {

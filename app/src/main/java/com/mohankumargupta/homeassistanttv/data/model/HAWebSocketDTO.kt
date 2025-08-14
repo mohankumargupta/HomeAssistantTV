@@ -99,6 +99,12 @@ data class Auth(
 ) : HAOutgoing { override val id: Int? = null }
 
 @Serializable
+@SerialName("config/area_registry/list")
+data class ListAreas(
+    override val id: Int
+) : HAOutgoing
+
+@Serializable
 @SerialName("ping")
 data class Ping(
     override val id: Int
@@ -127,4 +133,3 @@ data class CallService(
     @SerialName("service_data") val serviceData: JsonObject? = null,
     val target: JsonObject? = null
 ) : HAOutgoing
-
