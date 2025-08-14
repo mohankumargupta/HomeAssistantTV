@@ -33,6 +33,7 @@ fun ConnectingInstructionScreen(
         WebSocketConnectionState.Authenticated -> {
             Connected { onNextScreen() }
         }
+
         is WebSocketConnectionState.Closed -> {}
         is WebSocketConnectionState.Error -> {}
         else -> {
@@ -45,7 +46,28 @@ fun ConnectingInstructionScreen(
 
 @Composable
 fun Connected(modifier: Modifier = Modifier, onSelected: () -> Unit = {}) {
-    Text("Connected")
+    Box(
+        modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
+    ) {
+        val focusRequester = remember { FocusRequester() }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(
+                space = 96.dp,
+                alignment = Alignment.CenterVertically,
+            ),
+        ) {
+            Text("Connected")
+            Button(onClick = onSelected, modifier = modifier.focusRequester(focusRequester)) {
+                Text("Next")
+            }
+        }
+    }
 }
 
 @Composable
@@ -63,8 +85,7 @@ fun ConnectionInstruction(
 
 
     Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         val focusRequester = remember { FocusRequester() }
 
@@ -88,8 +109,7 @@ fun ConnectionInstruction(
                 Text(heading, style = MaterialTheme.typography.displayLarge)
                 Text(blurb, style = MaterialTheme.typography.bodyLarge)
                 Button(
-                    onClick = onSelected,
-                    modifier = modifier.focusRequester(focusRequester)
+                    onClick = onSelected, modifier = modifier.focusRequester(focusRequester)
                 ) {
                     Text("Connect")
                 }
