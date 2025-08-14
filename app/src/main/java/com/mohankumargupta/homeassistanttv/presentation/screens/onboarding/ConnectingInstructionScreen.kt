@@ -41,12 +41,6 @@ fun ConnectingInstructionScreen(
             }
         }
     }
-
-
-    ConnectionInstruction(modifier) {
-        viewModel.onClickConnecting()
-
-    }
 }
 
 @Composable

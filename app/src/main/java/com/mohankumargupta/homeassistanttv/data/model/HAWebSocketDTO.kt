@@ -6,11 +6,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
-// Configure once
 val haJson = Json {
     ignoreUnknownKeys = true
     classDiscriminator = "type" // Home Assistant uses "type"
-    encodeDefaults = true
+    encodeDefaults = false
     isLenient = true
 }
 
@@ -24,12 +23,14 @@ sealed interface HAIncoming {
 @Serializable
 @SerialName("auth_required")
 data class AuthRequired(
+    @SerialName("ha_version")
     val haVersion: String? = null
 ) : HAIncoming { override val id: Int? = null }
 
 @Serializable
 @SerialName("auth_ok")
 data class AuthOk(
+    @SerialName("ha_version")
     val haVersion: String? = null
 ) : HAIncoming { override val id: Int? = null }
 
@@ -93,6 +94,7 @@ sealed interface HAOutgoing {
 @Serializable
 @SerialName("auth")
 data class Auth(
+    @SerialName("access_token")
     val accessToken: String
 ) : HAOutgoing { override val id: Int? = null }
 

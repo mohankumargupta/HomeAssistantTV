@@ -6,6 +6,7 @@ import com.mohankumargupta.homeassistanttv.data.model.AuthOk
 import com.mohankumargupta.homeassistanttv.data.model.AuthRequired
 import com.mohankumargupta.homeassistanttv.data.model.Endpoint
 import com.mohankumargupta.homeassistanttv.data.model.HAIncoming
+import com.mohankumargupta.homeassistanttv.data.model.HAOutgoing
 import com.mohankumargupta.homeassistanttv.data.model.haJson
 import com.mohankumargupta.homeassistanttv.data.remote.WebSocketDataSource
 import com.mohankumargupta.homeassistanttv.data.remote.WebSocketEvent
@@ -55,7 +56,7 @@ class HomeAssistantRepositoryImpl @Inject constructor(
                             is AuthRequired -> {
                                 trySend(WebSocketConnectionState.AuthRequired)
                                 val authMessage = Auth(accessToken = token)
-                                val authJson = haJson.encodeToString(authMessage)
+                                val authJson = haJson.encodeToString(HAOutgoing.serializer(), authMessage)
                                 webSocketDataSource.send(authJson)
                             }
                             is AuthOk -> {
