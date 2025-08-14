@@ -84,6 +84,39 @@ data class Pong(
     override val id: Int
 ) : HAIncoming
 
+/*
+@Serializable
+data class AreaResult(
+    override val id: Int,
+    val type: String,
+    val success: Boolean,
+    val result: List<AreaInfo>
+): HAIncoming
+*/
+
+
+@Serializable
+data class AreaInfo(
+    val aliases: List<String>,
+    @SerialName("area_id")
+    val areaId: String,
+    @SerialName("floor_id")
+    val floorId: String? = null, // Assuming floor_id can be null
+    @SerialName("humidity_entity_id")
+    val humidityEntityId: String? = null, // Assuming humidity_entity_id can be null
+    val icon: String? = null, // Assuming icon can be null
+    val labels: List<String>,
+    val name: String,
+    val picture: String? = null, // Assuming picture can be null
+    @SerialName("temperature_entity_id")
+    val temperatureEntityId: String? = null, // Assuming temperature_entity_id can be null
+    @SerialName("created_at")
+    val createdAt: Double,
+    @SerialName("modified_at")
+    val modifiedAt: Double
+)
+
+
 /* ---------------- Outbound messages (to HA) ---------------- */
 
 @Serializable
@@ -101,7 +134,7 @@ data class Auth(
 @Serializable
 @SerialName("config/area_registry/list")
 data class ListAreas(
-    override val id: Int
+    override val id: Int?
 ) : HAOutgoing
 
 @Serializable

@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
+import com.mohankumargupta.homeassistanttv.presentation.screens.home.HomeScreen
 import com.mohankumargupta.homeassistanttv.presentation.screens.onboarding.ConnectingInstructionScreen
 import com.mohankumargupta.homeassistanttv.presentation.screens.onboarding.FindHomeAssistantScreen
 import com.mohankumargupta.homeassistanttv.presentation.screens.onboarding.WelcomeScreen
@@ -48,7 +49,7 @@ fun AppNavigation() {
             }
 
             entry<AppNavKey.Home> {
-
+                HomeScreen()
             }
         }
     )

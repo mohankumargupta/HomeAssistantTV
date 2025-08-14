@@ -71,7 +71,9 @@ class HomeAssistantRepositoryImpl @Inject constructor(
                                 trySend(WebSocketConnectionState.Error(IllegalStateException(msg)))
                                 webSocketDataSource.close(4001, "auth_invalid")
                             }
+
                             else -> {
+
                                 // Any other HA message (events, results, etc.)
                                 trySend(
                                     WebSocketConnectionState.Message(
@@ -99,7 +101,8 @@ class HomeAssistantRepositoryImpl @Inject constructor(
         }
 
     override fun getAreas() {
-        val message = ListAreas(messageId.getAndIncrement())
+        val newMessageId = messageId.getAndIncrement()
+        val message = ListAreas(newMessageId)
         val messageJson = haJson.encodeToString(HAOutgoing.serializer(), message)
         webSocketDataSource.send(messageJson)
     }

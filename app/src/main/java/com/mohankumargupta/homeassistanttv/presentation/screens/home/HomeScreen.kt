@@ -1,6 +1,7 @@
 package com.mohankumargupta.homeassistanttv.presentation.screens.home
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mohankumargupta.homeassistanttv.presentation.screens.onboarding.OnboardingViewModel
@@ -10,6 +11,10 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.getAreas()
+    }
+
     Home(modifier)
 }
 

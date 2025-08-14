@@ -48,12 +48,17 @@ class OnboardingViewModel @Inject constructor(
             selectedHomeAssistant?.let { homeAssistant ->
                 connectHomeAssistantUseCase(homeAssistant).collect { connectionState ->
                     _connectionState.value = connectionState
-                    listAreasUseCase()
+
                 }
             }
         }
 
     }
 
+    fun getAreas() {
+        viewModelScope.launch {
+            listAreasUseCase()
+        }
+    }
 
 }
