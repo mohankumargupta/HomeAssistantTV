@@ -1,5 +1,6 @@
 package com.mohankumargupta.homeassistanttv.domain.repository
 
+import com.mohankumargupta.homeassistanttv.data.model.AreaInfo
 import com.mohankumargupta.homeassistanttv.data.model.Auth
 import com.mohankumargupta.homeassistanttv.data.model.AuthInvalid
 import com.mohankumargupta.homeassistanttv.data.model.AuthOk
@@ -8,10 +9,12 @@ import com.mohankumargupta.homeassistanttv.data.model.Endpoint
 import com.mohankumargupta.homeassistanttv.data.model.HAIncoming
 import com.mohankumargupta.homeassistanttv.data.model.HAOutgoing
 import com.mohankumargupta.homeassistanttv.data.model.ListAreas
+import com.mohankumargupta.homeassistanttv.data.model.ResultMsg
 import com.mohankumargupta.homeassistanttv.data.model.haJson
 import com.mohankumargupta.homeassistanttv.data.remote.WebSocketDataSource
 import com.mohankumargupta.homeassistanttv.data.remote.WebSocketEvent
 import com.mohankumargupta.homeassistanttv.data.repository.MDNSRepository
+import com.mohankumargupta.homeassistanttv.domain.model.Area
 import com.mohankumargupta.homeassistanttv.domain.model.HomeAssistant
 import com.mohankumargupta.homeassistanttv.domain.model.WebSocketConnectionState
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +22,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.builtins.ListSerializer
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
@@ -70,6 +74,23 @@ class HomeAssistantRepositoryImpl @Inject constructor(
                                 val msg = incoming.message ?: "Authentication failed"
                                 trySend(WebSocketConnectionState.Error(IllegalStateException(msg)))
                                 webSocketDataSource.close(4001, "auth_invalid")
+                            }
+
+                            is ResultMsg -> {
+                                if (incoming.success && incoming.result != null) {
+                                    val areaInfoList = haJson.decodeFromJsonElement(
+                                        ListSerializer(AreaInfo.serializer()),
+                                        incoming.result
+                                    )
+                                    val areas = areaInfoList.map { areaInfo ->
+                                        Area(
+                                            areaId = areaInfo.areaId,
+                                            name = areaInfo.name,
+                                            pictureUrl = areaInfo.picture
+                                        )
+                                    }
+                                    trySend(WebSocketConnectionState.ListOfAreas(areas))
+                                }
                             }
 
                             else -> {
