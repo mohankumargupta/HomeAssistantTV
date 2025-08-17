@@ -50,6 +50,20 @@ class OnboardingViewModel @Inject constructor(
                 connectHomeAssistantUseCase(homeAssistant).collect { connectionState ->
                     _connectionState.value = connectionState
 
+                    when (connectionState) {
+                        WebSocketConnectionState.AuthRequired -> {}
+                        WebSocketConnectionState.Authenticated -> {}
+                        is WebSocketConnectionState.Closed -> {}
+                        WebSocketConnectionState.Connecting -> {}
+                        is WebSocketConnectionState.Error -> {}
+                        is WebSocketConnectionState.ListOfAreas -> {
+                            val areas = connectionState.areas
+                        }
+                        is WebSocketConnectionState.ListOfLabels -> {
+                            val labels = connectionState.labels
+                        }
+                        is WebSocketConnectionState.Message -> {}
+                    }
                 }
             }
         }
