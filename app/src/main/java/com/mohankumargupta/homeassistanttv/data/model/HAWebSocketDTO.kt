@@ -116,6 +116,15 @@ data class AreaInfo(
     val modifiedAt: Double
 )
 
+@Serializable
+data class LabelInfo(
+    @SerialName("color")
+    val color: String?,
+    val icon: String?,
+    @SerialName("label_id")
+    val labelId: String,
+    val name: String
+)
 
 /* ---------------- Outbound messages (to HA) ---------------- */
 
@@ -134,6 +143,12 @@ data class Auth(
 @Serializable
 @SerialName("config/area_registry/list")
 data class ListAreas(
+    override val id: Int?
+) : HAOutgoing
+
+@Serializable
+@SerialName("config/label_registry/list")
+data class ListLabels(
     override val id: Int?
 ) : HAOutgoing
 

@@ -10,4 +10,6 @@ interface HomeAssistantRepository {
     fun retrieveTokenAndConnectHomeAssistant(homeAssistant: HomeAssistant): Flow<WebSocketConnectionState>
 
     fun getAreas()
+
+    fun getLabels()
 }

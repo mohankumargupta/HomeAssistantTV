@@ -25,6 +25,7 @@ fun HomeScreen(
 ) {
     LaunchedEffect(Unit) {
         viewModel.getAreas()
+        viewModel.getLabels()
     }
 
 //    BackHandler(enabled = true) {
@@ -47,7 +48,7 @@ fun Home(
 
 @Composable
 fun HomeContents(modifier: Modifier = Modifier) {
-    Text("Home Screeen")
+    Text("Home Screen")
 }
 
 @Preview(device = Devices.TV_720p)
