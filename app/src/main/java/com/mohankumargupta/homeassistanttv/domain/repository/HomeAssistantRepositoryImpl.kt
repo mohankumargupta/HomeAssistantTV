@@ -21,7 +21,7 @@ import com.mohankumargupta.homeassistanttv.domain.model.HomeAssistant
 import com.mohankumargupta.homeassistanttv.domain.model.Label
 import com.mohankumargupta.homeassistanttv.domain.model.WebSocketConnectionState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
+//import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -29,6 +29,181 @@ import kotlinx.serialization.builtins.ListSerializer
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
+import kotlinx.serialization.json.JsonElement
+import java.util.concurrent.ConcurrentHashMap
+//import java.util.concurrent.atomic.AtomicInteger
+//import kotlinx.serialization.builtins.ListSerializer
+
+class HomeAssistantRepositoryImpl @Inject constructor(
+    private val mdnsRepository: MDNSRepository,
+    private val webSocketDataSource: WebSocketDataSource
+) : HomeAssistantRepository {
+
+    private val service = "_home-assistant._tcp."
+
+    private val messageId = AtomicInteger(1)
+
+    // id -> decoder that turns HA "result" JsonElement into a state we can emit
+    private val pending = ConcurrentHashMap<Int, (JsonElement) -> WebSocketConnectionState>()
+
+    override fun discoverHomeAssistants(): Flow<List<HomeAssistant>> =
+        mdnsRepository.discoverEndpoints(service).map { endpoints ->
+            endpoints.map { HomeAssistant(ip = it.ip, port = it.port) }
+        }
+
+    override fun retrieveTokenAndConnectHomeAssistant(
+        homeAssistant: HomeAssistant
+    ): Flow<WebSocketConnectionState> = channelFlow {
+        trySend(WebSocketConnectionState.Connecting)
+
+        val token = mdnsRepository
+            .getAccessToken(homeAssistant.toEndpoint())
+            .first()
+
+        val url = homeAssistant.wsUrl
+
+        webSocketDataSource.connect(url).collect { event ->
+            when (event) {
+                is WebSocketEvent.Open -> Unit
+
+                is WebSocketEvent.TextMessage -> {
+                    val raw = event.text
+                    when (val incoming = haJson.decodeFromString<HAIncoming>(raw)) {
+                        is AuthRequired -> {
+                            trySend(WebSocketConnectionState.AuthRequired)
+                            val authJson = haJson.encodeToString(
+                                HAOutgoing.serializer(),
+                                Auth(accessToken = token)
+                            )
+                            webSocketDataSource.send(authJson)
+                        }
+
+                        is AuthOk -> {
+                            trySend(WebSocketConnectionState.Authenticated)
+                        }
+
+                        is AuthInvalid -> {
+                            trySend(
+                                WebSocketConnectionState.Error(
+                                    IllegalStateException(incoming.message ?: "Authentication failed")
+                                )
+                            )
+                            webSocketDataSource.close(4001, "auth_invalid")
+                        }
+
+                        is ResultMsg -> {
+                            if (incoming.success && incoming.result != null) {
+                                // Route by id to the registered decoder/emitter
+                                val mapper = pending.remove(incoming.id)
+                                if (mapper != null) {
+                                    trySend(mapper(incoming.result))
+                                } else {
+                                    // Unexpected result id
+                                    trySend(
+                                        WebSocketConnectionState.Message(
+                                            type = incoming::class.simpleName,
+                                            raw = raw
+                                        )
+                                    )
+                                }
+                            } else {
+                                trySend(
+                                    WebSocketConnectionState.Error(
+                                        IllegalStateException(
+                                            "Request ${incoming.id} failed: ${incoming.error?.message ?: "unknown"}"
+                                        )
+                                    )
+                                )
+                            }
+                        }
+
+                        else -> {
+                            trySend(
+                                WebSocketConnectionState.Message(
+                                    type = incoming::class.simpleName,
+                                    raw = raw
+                                )
+                            )
+                        }
+                    }
+                }
+
+                is WebSocketEvent.Closing -> {
+                    pending.clear()
+                    trySend(WebSocketConnectionState.Closed(event.code, event.reason))
+                }
+
+                is WebSocketEvent.Closed -> {
+                    pending.clear()
+                    trySend(WebSocketConnectionState.Closed(event.code, event.reason))
+                }
+
+                is WebSocketEvent.Failure -> {
+                    pending.clear()
+                    trySend(WebSocketConnectionState.Error(event.throwable))
+                }
+            }
+        }
+    }
+
+    // Generic helper: build msg with id, register how to map result, send it
+    private fun sendRequest(
+        build: (Int) -> HAOutgoing,
+        onResult: (JsonElement) -> WebSocketConnectionState
+    ) {
+        val id = messageId.getAndIncrement()
+        pending[id] = onResult
+        val json = haJson.encodeToString(HAOutgoing.serializer(), build(id))
+        webSocketDataSource.send(json)
+    }
+
+    override fun getAreas() {
+        sendRequest(
+            build = ::ListAreas,
+            onResult = { resultElement ->
+                val infos = haJson.decodeFromJsonElement(
+                    ListSerializer(AreaInfo.serializer()),
+                    resultElement
+                )
+                WebSocketConnectionState.ListOfAreas(infos.map(AreaInfo::toDomain))
+            }
+        )
+    }
+
+    override fun getLabels() {
+        sendRequest(
+            build = ::ListLabels,
+            onResult = { resultElement ->
+                val infos = haJson.decodeFromJsonElement(
+                    ListSerializer(LabelInfo.serializer()),
+                    resultElement
+                )
+                WebSocketConnectionState.ListOfLabels(infos.map(LabelInfo::toDomain))
+            }
+        )
+    }
+}
+
+// Small helpers/mappers
+
+private fun HomeAssistant.toEndpoint(): Endpoint = Endpoint(ip = ip, port = port)
+private val HomeAssistant.wsUrl get() = "ws://$ip:$port/api/websocket"
+
+private fun AreaInfo.toDomain() = Area(
+    areaId = areaId,
+    name = name,
+    pictureUrl = picture
+)
+
+private fun LabelInfo.toDomain() = Label(
+    labelId = labelId,
+    name = name,
+    icon = icon,
+    color = color
+)
+
+
+/*
 class HomeAssistantRepositoryImpl @Inject constructor(
     private val mdnsRepository: MDNSRepository,
     private val webSocketDataSource: WebSocketDataSource
@@ -169,3 +344,6 @@ class HomeAssistantRepositoryImpl @Inject constructor(
 private fun HomeAssistant.toEndpoint(): Endpoint {
     return Endpoint(ip = ip, port = port)
 }
+
+
+ */
