@@ -1,5 +1,6 @@
 package com.mohankumargupta.homeassistanttv.presentation.screens.home
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -9,14 +10,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.tv.material3.Surface
-import androidx.tv.material3.Text
-import com.mohankumargupta.homeassistanttv.presentation.screens.home.components.TopBar
+import com.mohankumargupta.homeassistanttv.presentation.components.TopBar
 import com.mohankumargupta.homeassistanttv.presentation.screens.onboarding.OnboardingViewModel
 import com.mohankumargupta.homeassistanttv.presentation.theme.HomeAssistantTVTheme
-
-
 
 @Composable
 fun HomeScreen(
@@ -32,24 +31,30 @@ fun HomeScreen(
 //
 //    }
 
-    Home(modifier)
+    Home(modifier
+        .padding(horizontal = 32.dp)
+        .padding(top = 16.dp)
+    )
 }
 
 @Composable
 fun Home(
     modifier: Modifier = Modifier
 ) {
-    val topEntries = listOf("Home", "Areas", "Scenes", "Scrips", "QuickDeck")
+    val topEntries = listOf("Home", "Areas", "QuickDeck")
     var selectedIndex by remember { mutableIntStateOf(0) }
-    TopBar(modifier, topEntries, selectedIndex, onSelected = { index ->
-        selectedIndex = index
-    })
+    TopBar(
+        modifier,
+        entries = topEntries,
+        selectedTabIndex = selectedIndex,
+        onTabSelection = { selectedIndex = it }
+    )
 }
 
-@Composable
-fun HomeContents(modifier: Modifier = Modifier) {
-    Text("Home Screen")
-}
+//@Composable
+//fun HomeContents(modifier: Modifier = Modifier) {
+//    Text("Home Screen")
+//}
 
 @Preview(device = Devices.TV_720p)
 @Composable
