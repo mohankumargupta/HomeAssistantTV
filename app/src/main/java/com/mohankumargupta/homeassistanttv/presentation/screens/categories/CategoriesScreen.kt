@@ -53,7 +53,8 @@ private val glowColors = listOf(
     Color(0xFF90A4AE), // War & Military (Blue Grey)
     Color(0xFFFFB74D), // Musicals (Orange)
 )
-private val cardBackgroundColor = Color(0xFF2F2F2F)
+// A slightly lighter background color to reduce contrast and soften the glow
+private val cardBackgroundColor = Color(0xFF3A3A3A)
 
 @Immutable
 data class Padding(
@@ -103,15 +104,16 @@ private fun CatalogForImage(
         itemsIndexed(movieCategories) { index, movieCategory ->
             var isFocused by remember { mutableStateOf(false) }
 
-            val cardBrush = remember(index, isFocused) {
+            val cardBrush = remember(index) {
                 val glowColor = glowColors[index % glowColors.size]
-                val focusAlpha = if (isFocused) 0.25f else 0.1f // Glow is more intense on focus
+                // A single, very low alpha value for a consistent and subtle tint
+                val alpha = 0.12f
                 Brush.radialGradient(
                     colors = listOf(
-                        glowColor.copy(alpha = focusAlpha),
+                        glowColor.copy(alpha = alpha),
                         cardBackgroundColor
                     ),
-                    radius = 350f // A large radius for a very soft, diffuse glow
+                    radius = 400f // A large radius for a very soft, diffuse glow
                 )
             }
 
