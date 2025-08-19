@@ -1,6 +1,5 @@
 package com.mohankumargupta.homeassistanttv.presentation.screens.categories
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,29 +39,21 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 
-// Predefined list of gradients to match the target image
-private val categoryGradients = listOf(
-    Brush.linearGradient(colors = listOf(Color(0xFF641B23), Color(0xFF381519))),
-    Brush.linearGradient(colors = listOf(Color(0xFF1D2D64), Color(0xFF18244E))),
-    Brush.linearGradient(colors = listOf(Color(0xFF3C381B), Color(0xFF2E2A16))),
-    Brush.linearGradient(colors = listOf(Color(0xFF4C341B), Color(0xFF382715))),
-    Brush.linearGradient(colors = listOf(Color(0xFF1B3B44), Color(0xFF152C33))),
-    Brush.linearGradient(colors = listOf(Color(0xFF1B442C), Color(0xFF153322))),
-    Brush.linearGradient(colors = listOf(Color(0xFF441B1B), Color(0xFF331515))),
-    Brush.linearGradient(colors = listOf(Color(0xFF1D1B44), Color(0xFF171533))),
-    Brush.linearGradient(colors = listOf(Color(0xFF441B3B), Color(0xFF33152C))),
-    Brush.linearGradient(colors = listOf(Color(0xFF3B3B3B), Color(0xFF2C2C2C))),
-    Brush.linearGradient(colors = listOf(Color(0xFF442E1B), Color(0xFF332315))),
+// A palette of muted colors for the subtle "glow" effect.
+private val glowColors = listOf(
+    Color(0xFFE57373), // Action (Red)
+    Color(0xFF64B5F6), // Documentaries (Blue)
+    Color(0xFFDCE775), // Black Voices (Lime)
+    Color(0xFFFFB74D), // Comedy (Orange)
+    Color(0xFF4DD0E1), // Nature (Cyan)
+    Color(0xFF81C784), // Fantasy (Green)
+    Color(0xFFE57373), // Foreign (Red)
+    Color(0xFF7986CB), // Horror (Indigo)
+    Color(0xFFF06292), // LGBTQ (Pink)
+    Color(0xFF90A4AE), // War & Military (Blue Grey)
+    Color(0xFFFFB74D), // Musicals (Orange)
 )
-
-@Composable
-fun CardBackground(brush: Brush) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(brush)
-    )
-}
+private val cardBackgroundColor = Color(0xFF2F2F2F)
 
 @Immutable
 data class Padding(
@@ -94,100 +85,97 @@ data class MovieCategory(
 typealias MovieCategoryList = List<MovieCategory>
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTvMaterial3Api::class)
-    @Composable
-    private fun CatalogForImage(
-        movieCategories: MovieCategoryList,
-        modifier: Modifier = Modifier,
-        gridColumns: Int = 4,
-        onCategoryClick: (categoryId: String) -> Unit,
+@Composable
+private fun CatalogForImage(
+    movieCategories: MovieCategoryList,
+    modifier: Modifier = Modifier,
+    gridColumns: Int = 4,
+    onCategoryClick: (categoryId: String) -> Unit,
+) {
+    val childPadding = rememberChildPadding()
+
+    LazyVerticalGrid(
+        modifier = modifier
+            .padding(horizontal = childPadding.start)
+            .padding(top = childPadding.top),
+        columns = GridCells.Fixed(gridColumns),
     ) {
-        val childPadding = rememberChildPadding()
+        itemsIndexed(movieCategories) { index, movieCategory ->
+            var isFocused by remember { mutableStateOf(false) }
 
-        LazyVerticalGrid(
-            modifier = modifier
-                .padding(horizontal = childPadding.start)
-                .padding(top = childPadding.top),
-            columns = GridCells.Fixed(gridColumns),
-        ) {
-            itemsIndexed(movieCategories) { index, movieCategory ->
-                var isFocused by remember { mutableStateOf(false) }
+            val cardBrush = remember(index, isFocused) {
+                val glowColor = glowColors[index % glowColors.size]
+                val focusAlpha = if (isFocused) 0.25f else 0.1f // Glow is more intense on focus
+                Brush.radialGradient(
+                    colors = listOf(
+                        glowColor.copy(alpha = focusAlpha),
+                        cardBackgroundColor
+                    ),
+                    radius = 350f // A large radius for a very soft, diffuse glow
+                )
+            }
 
-                Card(
-                    onClick = { onCategoryClick(movieCategory.id) },
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .aspectRatio(16 / 9f)
-                        .onFocusChanged {
-                            isFocused = it.isFocused || it.hasFocus
-                        }
-                        .focusProperties {
-                            if (index % gridColumns == 0) {
-                                left = FocusRequester.Cancel
-                            }
-                        },
-                    shape = CardDefaults.shape(shape = MaterialTheme.shapes.medium),
-                    colors = CardDefaults.colors(
-                        containerColor = Color.Transparent,
-                        contentColor = Color.White
-                    )
-                ) {
-                    val overlayAlpha by animateFloatAsState(
-                        targetValue = if (isFocused) 0.4f else 0.7f, // Adjusted alpha
-                        label = "overlayAlpha"
-                    )
-
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(MaterialTheme.shapes.medium)
-                    ) {
-                        // Use a deterministic gradient from the list
-                        CardBackground(brush = categoryGradients[index % categoryGradients.size])
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Black.copy(alpha = overlayAlpha))
-                        )
-
-                        Text(
-                            text = movieCategory.name,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
+            Card(
+                onClick = { onCategoryClick(movieCategory.id) },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .aspectRatio(16 / 9f)
+                    .onFocusChanged {
+                        isFocused = it.isFocused || it.hasFocus
                     }
+                    .focusProperties {
+                        if (index % gridColumns == 0) {
+                            left = FocusRequester.Cancel
+                        }
+                    },
+                shape = CardDefaults.shape(shape = MaterialTheme.shapes.medium),
+                colors = CardDefaults.colors(containerColor = Color.Transparent)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(cardBrush) // The entire card background is one subtle gradient
+                ) {
+                    Text(
+                        text = movieCategory.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
                 }
             }
         }
     }
+}
 
-    @OptIn(ExperimentalTvMaterial3Api::class)
-    @Preview(device = "id:tv_1080p")
-    @Composable
-    fun CatalogAsImagePreview() {
-        val sampleMovieCategories = listOf(
-            MovieCategory("1", "Action"),
-            MovieCategory("2", "Documentaries"),
-            MovieCategory("3", "Black Voices"),
-            MovieCategory("4", "Comedy"),
-            MovieCategory("5", "Nature"),
-            MovieCategory("6", "Fantasy"),
-            MovieCategory("7", "Foreign"),
-            MovieCategory("8", "Horror"),
-            MovieCategory("9", "LGBTQ"),
-            MovieCategory("10", "War & Military"),
-            MovieCategory("11", "Musicals"),
-        )
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Preview(device = "id:tv_1080p")
+@Composable
+fun CatalogAsImagePreview() {
+    val sampleMovieCategories = listOf(
+        MovieCategory("1", "Action"),
+        MovieCategory("2", "Documentaries"),
+        MovieCategory("3", "Black Voices"),
+        MovieCategory("4", "Comedy"),
+        MovieCategory("5", "Nature"),
+        MovieCategory("6", "Fantasy"),
+        MovieCategory("7", "Foreign"),
+        MovieCategory("8", "Horror"),
+        MovieCategory("9", "LGBTQ"),
+        MovieCategory("10", "War & Military"),
+        MovieCategory("11", "Musicals"),
+    )
 
-        MaterialTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                colors = SurfaceDefaults.colors(containerColor = Color(0xFF1C1C1C))
-            ) {
-                CatalogForImage(
-                    movieCategories = sampleMovieCategories,
-                    onCategoryClick = { }
-                )
-            }
+    MaterialTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            colors = SurfaceDefaults.colors(containerColor = Color(0xFF1C1C1C))
+        ) {
+            CatalogForImage(
+                movieCategories = sampleMovieCategories,
+                onCategoryClick = { }
+            )
         }
     }
+}
