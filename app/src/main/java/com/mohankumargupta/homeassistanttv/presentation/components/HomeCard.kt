@@ -17,6 +17,7 @@ import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.StandardCardContainer
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.mohankumargupta.homeassistanttv.presentation.theme.HomeAssistantTVTheme
 
 
 val JetStreamCardShape = ShapeDefaults.ExtraSmall
@@ -58,16 +59,20 @@ fun HomeCard(
 @Preview(device = TV_720p)
 @Composable
 fun HomeCardPreview() {
-    HomeCard(
-        onClick = { /* TODO: Handle click for preview */ },
-        title = { Text("Sample Title") },
-        image = {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Sample Image Area")
-            }
+    HomeAssistantTVTheme(isInDarkTheme = true) {
+        Surface {
+            HomeCard(
+                onClick = { /* TODO: Handle click for preview */ },
+                title = { Text("Sample Title") },
+                image = {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Sample Image Area")
+                    }
+                }
+            )
         }
-    )
+    }
 }

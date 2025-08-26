@@ -78,20 +78,20 @@ fun rememberChildPadding(direction: LayoutDirection = LocalLayoutDirection.curre
     }
 }
 
-data class MovieCategory(
+data class Category(
     val id: String,
     val name: String,
 )
 
-typealias MovieCategoryList = List<MovieCategory>
+typealias CategoryList = List<Category>
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTvMaterial3Api::class)
 @Composable
-private fun CatalogForImage(
-    movieCategories: MovieCategoryList,
+public fun JetstreamCategories(
+    movieCategories: List<Category>,
     modifier: Modifier = Modifier,
     gridColumns: Int = 4,
-    onCategoryClick: (categoryId: String) -> Unit,
+    onCategoryClick: (String) -> Unit,
 ) {
     val childPadding = rememberChildPadding()
 
@@ -156,17 +156,17 @@ private fun CatalogForImage(
 @Composable
 fun CatalogAsImagePreview() {
     val sampleMovieCategories = listOf(
-        MovieCategory("1", "Action"),
-        MovieCategory("2", "Documentaries"),
-        MovieCategory("3", "Black Voices"),
-        MovieCategory("4", "Comedy"),
-        MovieCategory("5", "Nature"),
-        MovieCategory("6", "Fantasy"),
-        MovieCategory("7", "Foreign"),
-        MovieCategory("8", "Horror"),
-        MovieCategory("9", "LGBTQ"),
-        MovieCategory("10", "War & Military"),
-        MovieCategory("11", "Musicals"),
+        Category("1", "Action"),
+        Category("2", "Documentaries"),
+        Category("3", "Black Voices"),
+        Category("4", "Comedy"),
+        Category("5", "Nature"),
+        Category("6", "Fantasy"),
+        Category("7", "Foreign"),
+        Category("8", "Horror"),
+        Category("9", "LGBTQ"),
+        Category("10", "War & Military"),
+        Category("11", "Musicals"),
     )
 
     MaterialTheme {
@@ -174,7 +174,7 @@ fun CatalogAsImagePreview() {
             modifier = Modifier.fillMaxSize(),
             colors = SurfaceDefaults.colors(containerColor = Color(0xFF1C1C1C))
         ) {
-            CatalogForImage(
+            JetstreamCategories(
                 movieCategories = sampleMovieCategories,
                 onCategoryClick = { }
             )

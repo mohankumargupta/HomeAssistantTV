@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices.TV_720p
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Border
@@ -31,7 +32,9 @@ import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.mohankumargupta.homeassistanttv.presentation.theme.HomeAssistantTVTheme
 
 // Data class to represent a single category
 data class Category(val id: String, val name: String)
@@ -60,7 +63,8 @@ fun PositionFocusedItemInLazyLayout(
                 containerSize: Float
             ): Float {
                 val childSmallerThanParent = size <= containerSize
-                val initialTargetForLeadingEdge = parentFraction * containerSize - (childFraction * size)
+                val initialTargetForLeadingEdge =
+                    parentFraction * containerSize - (childFraction * size)
                 val spaceAvailableToShowItem = containerSize - initialTargetForLeadingEdge
                 val targetForLeadingEdge =
                     if (childSmallerThanParent && spaceAvailableToShowItem < size) {
@@ -157,10 +161,12 @@ fun CategoryCard(category: Category, modifier: Modifier = Modifier) {
 /**
  * A preview for the CategoriesScreen to see the layout in Android Studio.
  */
-@Preview(device = "id:tv_1080p")
+@Preview(device = TV_720p)
 @Composable
 fun CategoriesScreenPreview() {
-    MaterialTheme {
-        CategoriesScreen(categories = sampleCategories)
+    HomeAssistantTVTheme(isInDarkTheme = true) {
+        Surface {
+            CategoriesScreen(categories = sampleCategories)
+        }
     }
 }
