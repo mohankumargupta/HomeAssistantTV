@@ -61,7 +61,7 @@ fun TopBar(
             Icon(
                 painter = painterResource(R.drawable.home_assistant_icon),
                 contentDescription = "avatar icon",
-                modifier = modifier.size(32.dp),
+                modifier = Modifier.size(32.dp),
                 tint = Color.Unspecified,
             )
             Row(
@@ -90,11 +90,15 @@ fun TopBar(
                         key(index) {
                          Tab(
                              selected = index == selectedTabIndex,
-                             onFocus = {},
+                             onFocus = {
+                                 onTabSelection(index);
+                             },
                              modifier = Modifier
                                  .height(32.dp)
                                  .focusRequester(focusRequesters[index + 1]),
-                             onClick = {},
+                             onClick = {
+                                 onTabSelection(index);
+                             },
                          ) {
                              Text(
                                  modifier = Modifier
